@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 //Deathsquad suit
 /obj/item/clothing/head/helmet/space/deathsquad
 	name = "deathsquad helmet"
@@ -17,6 +18,8 @@
 	flags = FPRINT | TABLEPASS | HEADCOVERSEYES | BLOCKHAIR | STOPSPRESSUREDMAGE | PLASMAGUARD
 	siemens_coefficient = 0.9
 
+=======
+>>>>>>> 4efb7bec4f7a0bfa8aa193c41c700b9df949d7b5
 //Paramedic EVA suit
 /obj/item/clothing/head/helmet/space/paramedic
 	name = "Paramedic EVA helmet"
@@ -38,7 +41,7 @@
 	name = "Santa's hat"
 	desc = "Ho ho ho. Merrry X-mas!"
 	icon_state = "santahat"
-	flags = FPRINT | TABLEPASS | HEADCOVERSEYES | BLOCKHAIR | STOPSPRESSUREDMAGE
+	flags = FPRINT  | BLOCKHAIR | STOPSPRESSUREDMG
 
 /obj/item/clothing/suit/space/santa
 	name = "Santa's suit"
@@ -46,7 +49,7 @@
 	icon_state = "santa"
 	item_state = "santa"
 	slowdown = 0
-	flags = FPRINT | TABLEPASS | ONESIZEFITSALL | STOPSPRESSUREDMAGE
+	flags = FPRINT  | ONESIZEFITSALL | STOPSPRESSUREDMG
 	allowed = list(/obj/item) //for stuffing exta special presents
 
 
@@ -57,7 +60,6 @@
 	icon_state = "pirate"
 	item_state = "pirate"
 	armor = list(melee = 60, bullet = 50, laser = 30,energy = 15, bomb = 30, bio = 30, rad = 30)
-	flags = FPRINT | TABLEPASS | HEADCOVERSEYES | BLOCKHAIR | STOPSPRESSUREDMAGE
 	siemens_coefficient = 0.9
 
 

@@ -45,10 +45,10 @@
 
 #define MAINTAINING_OBJECT_POOL_COUNT 20
 
-var/list/masterPool = new
+var/global/list/masterPool = new
 
 // Read-only or compile-time vars and special exceptions.
-var/list/exclude = list("loc", "locs", "parent_type", "vars", "verbs", "type", "x", "y", "z")
+var/list/exclude = list("inhand_states", "loc", "locs", "parent_type", "vars", "verbs", "type", "x", "y", "z")
 
 /*
  * @args
@@ -71,7 +71,8 @@ var/list/exclude = list("loc", "locs", "parent_type", "vars", "verbs", "type", "
 	#ifdef DEBUG_OBJECT_POOL
 	world << text("DEBUG_OBJECT_POOL: getFromPool([]) [] left.", A, length(masterPool[A]))
 	#endif
-
+	if(!O)
+		O = new A
 	O.loc = B
 	return O
 
@@ -85,6 +86,9 @@ var/list/exclude = list("loc", "locs", "parent_type", "vars", "verbs", "type", "
  * Example call: returnToPool(src)
  */
 /proc/returnToPool(const/atom/movable/AM)
+	if(istype(AM.loc,/mob/living))
+		var/mob/living/L = AM.loc
+		L.u_equip(AM)
 	if(length(masterPool["[AM.type]"]) > MAINTAINING_OBJECT_POOL_COUNT)
 		#ifdef DEBUG_OBJECT_POOL
 		world << text("DEBUG_OBJECT_POOL: returnToPool([]) exceeds [] discarding...", AM.type, MAINTAINING_OBJECT_POOL_COUNT)
@@ -96,8 +100,8 @@ var/list/exclude = list("loc", "locs", "parent_type", "vars", "verbs", "type", "
 	if(isnull(masterPool["[AM.type]"]))
 		masterPool["[AM.type]"] = new
 
-	masterPool["[AM.type]"] += AM
 	AM.resetVariables()
+	masterPool["[AM.type]"] += AM
 
 	#ifdef DEBUG_OBJECT_POOL
 	world << text("DEBUG_OBJECT_POOL: returnToPool([]) [] left.", AM.type, length(masterPool["[AM.type]"]))
@@ -136,3 +140,13 @@ var/list/exclude = list("loc", "locs", "parent_type", "vars", "verbs", "type", "
 			continue
 
 		vars[key] = initial(vars[key])
+
+/proc/isInTypes(atom/Object, types)
+	var/prototype = Object.type
+	Object = null
+
+	for (var/type in params2list(types))
+		if (ispath(prototype, text2path(type)))
+			return 1
+
+	return 0

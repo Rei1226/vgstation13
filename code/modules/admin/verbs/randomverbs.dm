@@ -35,7 +35,7 @@
 		M.loc = pick(prisonwarp)
 		if(istype(M, /mob/living/carbon/human))
 			var/mob/living/carbon/human/prisoner = M
-			prisoner.equip_to_slot_or_del(new /obj/item/clothing/under/color/orange(prisoner), slot_w_uniform)
+			prisoner.equip_to_slot_or_del(new /obj/item/clothing/under/color/prisoner(prisoner), slot_w_uniform)
 			prisoner.equip_to_slot_or_del(new /obj/item/clothing/shoes/orange(prisoner), slot_shoes)
 		spawn(50)
 			M << "\red You have been sent to the prison station!"
@@ -200,7 +200,6 @@ proc/cmd_admin_mute(mob/M as mob, mute_type, automute = 0)
 		for(var/mob/M in get_active_candidates(ROLE_ALIEN))
 			if(M.stat != DEAD)		continue	//we are not dead!
 			if(M.client.is_afk())	continue	//we are afk
-			if(M.mind && M.mind.current && M.mind.current.stat != DEAD)	continue	//we have a live body we are tied to
 			candidates += M.ckey
 		if(candidates.len)
 			ckey = input("Pick the player you want to respawn as a xeno.", "Suitable Candidates") as null|anything in candidates

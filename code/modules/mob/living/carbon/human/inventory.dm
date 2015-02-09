@@ -16,7 +16,7 @@
 		else
 			H << "\red You are unable to equip that."
 
-/mob/living/carbon/human/proc/get_all_slots()
+/mob/living/carbon/human/get_all_slots()
 	return list(
 		back,
 		wear_mask,
@@ -36,6 +36,21 @@
 		l_store,
 		r_store,
 		s_store)
+
+//everything on the mob that is not in its pockets, hands and belt.
+/mob/living/carbon/human/get_clothing_items()
+	var/list/equipped = ..()
+	equipped -= list(back,
+					handcuffed,
+					legcuffed,
+					belt,
+					wear_id,
+					gloves,
+					head,
+					shoes,
+					wear_suit,
+					w_uniform)
+	return equipped
 
 /mob/living/carbon/human/proc/equip_in_one_of_slots(obj/item/W, list/slots, act_on_fail = 1)
 	for (var/slot in slots)
@@ -250,7 +265,6 @@
 			if (client)
 				client.screen -= W
 			W.loc = loc
-			W.dropped(src)
 			if(W)
 				W.layer = initial(W.layer)
 	update_action_buttons()
@@ -310,8 +324,9 @@
 			update_inv_gloves(redraw_mob)
 		if(slot_head)
 			src.head = W
-			if((head.flags & BLOCKHAIR) || (head.flags & BLOCKHEADHAIR))
-				update_hair(redraw_mob)	//rebuild hair
+			//if((head.flags & BLOCKHAIR) || (head.flags & BLOCKHEADHAIR)) //Makes people bald when switching to one with no Blocking flags
+			//	update_hair(redraw_mob)	//rebuild hair
+			update_hair(redraw_mob)
 			if(istype(W,/obj/item/clothing/head/kitty))
 				W.update_icon(src)
 			update_inv_head(redraw_mob)
@@ -363,6 +378,7 @@
 /obj/effect/equip_e/human/Destroy()
 	if(target)
 		target.requests -= src
+	..()
 
 /obj/effect/equip_e/monkey
 	name = "monkey"
@@ -371,6 +387,7 @@
 /obj/effect/equip_e/monkey/Destroy()
 	if(target)
 		target.requests -= src
+	..()
 
 /obj/effect/equip_e/process()
 	return
@@ -832,9 +849,9 @@ It can still be worn/put on as normal.
 			if(item && target.has_organ_for_slot(slot_to_process)) //Placing an item on the mob
 				if(item.mob_can_equip(target, slot_to_process, 0))
 					source.u_equip(item)
-					target.equip_to_slot_if_possible(item, slot_to_process, 0, 1, 1)
 					if(item)
 						item.dropped(source)
+					target.equip_to_slot_if_possible(item, slot_to_process, 0, 1, 1)
 					source.update_icons()
 					target.update_icons()
 

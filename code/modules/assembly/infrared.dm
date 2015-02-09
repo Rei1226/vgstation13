@@ -43,7 +43,7 @@
 
 
 /obj/item/device/assembly/infra/update_icon()
-	overlays.Cut()
+	overlays.len = 0
 	attached_overlays = list()
 	if(on)
 		overlays += "infrared_on"
@@ -171,7 +171,7 @@
 	var/visible = 0.0
 	var/left = null
 	anchored = 1.0
-	flags = TABLEPASS
+	flags = 0
 
 	var/obj/item/device/assembly/infra/assembly
 

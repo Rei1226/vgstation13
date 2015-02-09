@@ -23,11 +23,31 @@
 	min_n2 = 0
 	max_n2 = 0
 	minbodytemp = 0
+	show_stat_health = 0
 	faction = "cult"
 	supernatural = 1
 	var/nullblock = 0
 
+	mob_swap_flags = HUMAN|SIMPLE_ANIMAL|SLIME|MONKEY
+	mob_push_flags = ALLMOBS
+
 	var/list/construct_spells = list()
+
+/mob/living/simple_animal/construct/construct_chat_check(setting)
+	if(!mind) return
+
+	if(mind in ticker.mode.cult)
+		return 1
+
+/mob/living/simple_animal/construct/handle_inherent_channels(message, message_mode)
+	if(..())
+		return 1
+	if(message_mode == MODE_HEADSET && construct_chat_check(0))
+		log_say("Cult channel: [src.name]/[src.key] : [message]")
+		for(var/mob/M in mob_list)
+			if(M.construct_chat_check(2) /*receiving check*/ || ((M in dead_mob_list) && !istype(M, /mob/new_player)))
+				M << "<span class='sinister'><b>[src.name]:</b> [message]</span>"
+		return 1
 
 /mob/living/simple_animal/construct/cultify()
 	return
@@ -50,9 +70,7 @@
 	del src
 	return
 
-/mob/living/simple_animal/construct/examine()
-	set src in oview()
-
+/mob/living/simple_animal/construct/examine(mob/user)
 	var/msg = "<span cass='info'>*---------*\nThis is \icon[src] \a <EM>[src]</EM>!\n"
 	if (src.health < src.maxHealth)
 		msg += "<span class='warning'>"
@@ -63,40 +81,7 @@
 		msg += "</span>"
 	msg += "*---------*</span>"
 
-	usr << msg
-	return
-
-/mob/living/simple_animal/construct/Bump(atom/movable/AM as mob|obj, yes)
-	if ((!( yes ) || now_pushing))
-		return
-	now_pushing = 1
-	if(ismob(AM))
-		var/mob/tmob = AM
-		if(istype(tmob, /mob/living/carbon/human) && (M_FAT in tmob.mutations))
-			if(prob(5))
-				src << "\red <B>You fail to push [tmob]'s fat ass out of the way.</B>"
-				now_pushing = 0
-				return
-		if(!(tmob.status_flags & CANPUSH))
-			now_pushing = 0
-			return
-		now_pushing = 1
-
-		tmob.LAssailant = src
-	now_pushing = 0
-	..()
-	if (!istype(AM, /atom/movable))
-		return
-	if (!( now_pushing ))
-		now_pushing = 1
-		if (!( AM.anchored ))
-			var/t = get_dir(src, AM)
-			if (istype(AM, /obj/structure/window/full))
-				for(var/obj/structure/window/win in get_step(AM,t))
-					now_pushing = 0
-					return
-			step(AM, t)
-		now_pushing = null
+	user << msg
 
 
 /mob/living/simple_animal/construct/attack_animal(mob/living/simple_animal/M as mob)
@@ -121,6 +106,7 @@
 			adjustBruteLoss(damage)
 
 /mob/living/simple_animal/construct/attackby(var/obj/item/O as obj, var/mob/user as mob)
+	user.delayNextAttack(8)
 	if(O.force)
 		var/damage = O.force
 		if (O.damtype == HALLOSS)
@@ -138,12 +124,6 @@
 			if ((M.client && !( M.blinded )))
 				M.show_message("\red [user] gently taps [src] with [O]. ")
 
-
-/mob/living/simple_animal/construct/airflow_stun()
-	return
-
-/mob/living/simple_animal/construct/airflow_hit(atom/A)
-	return
 
 /////////////////Juggernaut///////////////
 
@@ -170,6 +150,7 @@
 	construct_spells = list(/obj/effect/proc_holder/spell/aoe_turf/conjure/lesserforcewall)
 
 /mob/living/simple_animal/construct/armoured/attackby(var/obj/item/O as obj, var/mob/user as mob)
+	user.delayNextAttack(8)
 	if(O.force)
 		if(O.force >= 11)
 			var/damage = O.force
@@ -297,6 +278,7 @@
 	var/max_energy = 1000
 
 /mob/living/simple_animal/construct/behemoth/attackby(var/obj/item/O as obj, var/mob/user as mob)
+	user.delayNextAttack(8)
 	if(O.force)
 		if(O.force >= 11)
 			var/damage = O.force

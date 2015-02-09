@@ -99,7 +99,8 @@
 	beam_testing("Bumped by [AM]")
 	am_connector=1
 	connect_to(AM)
-	BEAM_DEL(src)
+	//BEAM_DEL(src)
+	qdel(src)
 
 /obj/effect/beam/proc/get_master()
 	if(master)
@@ -108,6 +109,9 @@
 
 /obj/effect/beam/proc/get_damage()
 	return damage
+
+/obj/effect/beam/proc/get_machine_underlay(var/mdir)
+	return image(icon=icon, icon_state="[icon_state] underlay", dir=mdir)
 
 /obj/effect/beam/proc/connect_to(var/atom/movable/AM)
 	if(!AM)
@@ -137,8 +141,10 @@
 /obj/effect/beam/proc/killKids()
 	for(var/obj/effect/beam/child in children)
 		if(child)
-			BEAM_DEL(child)
-	children.Cut()
+			//BEAM_DEL(child)
+			children -= child
+			qdel(child)
+	children.len = 0
 
 /obj/effect/beam/proc/disconnect(var/re_emit=1)
 	var/obj/effect/beam/_master=get_master()
@@ -170,7 +176,8 @@
 	beam_testing(" Connecting!")
 	am_connector=1
 	connect_to(AM)
-	BEAM_DEL(src)
+	//BEAM_DEL(src)
+	qdel(src)
 
 /obj/effect/beam/proc/HasSource(var/atom/source)
 	return source in sources
@@ -196,11 +203,13 @@
 		return
 
 	if(!loc)
-		BEAM_DEL(src)
+		//BEAM_DEL(src)
+		qdel(src)
 		return
 
 	if((x == 1 || x == world.maxx || y == 1 || y == world.maxy))
-		BEAM_DEL(src)
+		//BEAM_DEL(src)
+		qdel(src)
 		return
 
 	// If we're master, we're actually invisible, and we're on the same tile as the machine.
@@ -217,13 +226,15 @@
 		step(src, dir) // Move.
 
 		if(bumped)
-			BEAM_DEL(src)
+			//BEAM_DEL(src)
+			qdel(src)
 			return
 
 		stepped=1
 
 		if(_range-- < 1)
-			BEAM_DEL(src)
+			//BEAM_DEL(src)
+			qdel(src)
 			return
 
 	update_icon()
@@ -235,7 +246,8 @@
 	var/obj/effect/beam/B = new type(src.loc)
 	B.dir=dir
 	B.master = get_master()
-	B.master.children.Add(next)
+	if(B.master != B)
+		B.master.children.Add(B)
 	return B
 
 /obj/effect/beam/Bump(var/atom/A as mob|obj|turf|area)
@@ -248,13 +260,60 @@
 		am_connector=1 // Prevents disconnecting after stepping into target.
 	return 1
 
+/obj/effect/beam/emitter/Destroy()
+	if(sources && sources.len)
+		for(var/obj/machinery/power/emitter/E in sources)
+			if(E.beam == src)
+				E.beam = null
+	..()
+
 /obj/effect/beam/Destroy()
+	if(target)
+		if(target.beams)
+			target.beams -= src
+	for(var/obj/machinery/mirror/M in mirror_list)
+		if(!M)
+			continue
+		if(src in M.beams)
+			M.beams -= src
+	for(var/obj/machinery/field_generator/F in field_gen_list)
+		if(!F)
+			continue
+		if(src in F.beams)
+			F.beams -= src
+	for(var/obj/machinery/prism/P in prism_list)
+		var/changed = 0
+		if(src == P.beam)
+			P.beam = null
+			changed = 1
+		if(src in P.beams)
+			P.beams -= src
+			changed = 1
+		if(changed)
+			P.update_beams()
+	for(var/obj/machinery/power/photocollector/PC in photocollector_list)
+		if(src in PC.beams)
+			PC.beams -= src
 	if(!am_connector && !master)
 		beam_testing("\ref[get_master()] - Disconnecting (deleted)")
 		disconnect(0)
 	if(master)
+		if(master.target && master.target.beams)
+			master.target.beams -= src
+		for(var/obj/effect/beam/B in master.children)
+			if(B.next == src)
+				B.next = null
+		if(master.next == src)
+			master.next = null
 		master.children.Remove(src)
+		master = null
+	else if(children && children.len)
+		killKids()
 	if(next)
-		BEAM_DEL(next)
+		//BEAM_DEL(next)
+		qdel(next)
 		next=null
 	..()
+
+/obj/effect/beam/singularity_pull()
+	return

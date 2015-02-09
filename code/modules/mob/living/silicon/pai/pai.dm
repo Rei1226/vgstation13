@@ -3,7 +3,6 @@
 	icon = 'icons/mob/mob.dmi'//
 	icon_state = "shadow"
 
-	robot_talk_understand = 0
 	emote_type = 2		// pAIs emotes are heard, not seen, so they can be seen through a container (eg. person)
 
 	var/network = list("SS13")
@@ -13,7 +12,6 @@
 	var/list/software = list()
 	var/userDNA		// The DNA string of our assigned user
 	var/obj/item/device/paicard/card	// The card we inhabit
-	var/obj/item/device/radio/radio		// Our primary radio
 
 	var/speakStatement = "states"
 	var/speakExclamation = "declares"
@@ -86,13 +84,12 @@
 
 /mob/living/silicon/pai/Stat()
 	..()
-	statpanel("Status")
-	if (src.client.statpanel == "Status")
+	if(statpanel("Status"))
 		show_silenced()
 
-	if (proc_holder_list.len)//Generic list for proc_holder objects.
-		for(var/obj/effect/proc_holder/P in proc_holder_list)
-			statpanel("[P.panel]","",P)
+		if (proc_holder_list.len)//Generic list for proc_holder objects.
+			for(var/obj/effect/proc_holder/P in proc_holder_list)
+				statpanel("[P.panel]","",P)
 
 /mob/living/silicon/pai/check_eye(var/mob/user as mob)
 	if (!src.current)

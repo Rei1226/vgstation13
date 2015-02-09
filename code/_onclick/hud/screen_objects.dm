@@ -14,6 +14,9 @@
 	var/obj/master = null	//A reference to the object in the slot. Grabs or items, generally.
 	var/gun_click_time = -100 //I'm lazy.
 
+/obj/screen/Destroy()
+	master = null
+	..()
 
 /obj/screen/text
 	icon = null
@@ -48,7 +51,7 @@
 /obj/screen/item_action/Click()
 	if(!usr || !owner)
 		return 1
-	if(usr.next_move >= world.time)
+	if(usr.attack_delayer.blocked())
 		return
 	//usr.next_move = world.time + 6
 
@@ -83,15 +86,14 @@
 /obj/screen/grab/Destroy()
 	if(master)
 		master = null
-
 	..()
 
 /obj/screen/storage
 	name = "storage"
 
 /obj/screen/storage/Click()
-	if(world.time <= usr.next_move)
-		return 1
+	if(usr.attack_delayer.blocked())
+		return
 	if(usr.stat || usr.paralysis || usr.stunned || usr.weakened)
 		return 1
 	if (istype(usr.loc,/obj/mecha)) // stops inventory actions in a mech
@@ -198,7 +200,7 @@
 	return 1
 
 /obj/screen/zone_sel/update_icon()
-	overlays.Cut()
+	overlays.len = 0
 	overlays += image('icons/mob/zone_sel.dmi', "[selecting]")
 
 
@@ -385,10 +387,12 @@
 			usr.drop_item_v()
 
 		if("module")
-			if(issilicon(usr))
-				if(usr:module)
+			if(isrobot(usr))
+				var/mob/living/silicon/robot/R = usr
+				if(R.module)
+					R.hud_used.toggle_show_robot_modules()
 					return 1
-				usr:pick_module()
+				R:pick_module()
 
 		if("radio")
 			if(issilicon(usr))
@@ -398,8 +402,9 @@
 				usr:installed_modules()
 
 		if("store")
-			if(issilicon(usr))
-				usr:uneq_active()
+			if(isrobot(usr))
+				var/mob/living/silicon/robot/R = usr
+				R.uneq_active()
 
 		if(INV_SLOT_TOOL)
 			if(istype(usr, /mob/living/silicon/robot/mommi))
@@ -491,7 +496,7 @@
 		if("Allow Walking")
 			if(gun_click_time > world.time - 30)	//give them 3 seconds between mode changes.
 				return
-			if(!istype(usr.equipped(),/obj/item/weapon/gun))
+			if(!istype(usr.get_active_hand(),/obj/item/weapon/gun))
 				usr << "You need your gun in your active hand to do that!"
 				return
 			usr.client.AllowTargetMove()
@@ -500,7 +505,7 @@
 		if("Disallow Walking")
 			if(gun_click_time > world.time - 30)	//give them 3 seconds between mode changes.
 				return
-			if(!istype(usr.equipped(),/obj/item/weapon/gun))
+			if(!istype(usr.get_active_hand(),/obj/item/weapon/gun))
 				usr << "You need your gun in your active hand to do that!"
 				return
 			usr.client.AllowTargetMove()
@@ -509,7 +514,7 @@
 		if("Allow Running")
 			if(gun_click_time > world.time - 30)	//give them 3 seconds between mode changes.
 				return
-			if(!istype(usr.equipped(),/obj/item/weapon/gun))
+			if(!istype(usr.get_active_hand(),/obj/item/weapon/gun))
 				usr << "You need your gun in your active hand to do that!"
 				return
 			usr.client.AllowTargetRun()
@@ -518,7 +523,7 @@
 		if("Disallow Running")
 			if(gun_click_time > world.time - 30)	//give them 3 seconds between mode changes.
 				return
-			if(!istype(usr.equipped(),/obj/item/weapon/gun))
+			if(!istype(usr.get_active_hand(),/obj/item/weapon/gun))
 				usr << "You need your gun in your active hand to do that!"
 				return
 			usr.client.AllowTargetRun()
@@ -527,7 +532,7 @@
 		if("Allow Item Use")
 			if(gun_click_time > world.time - 30)	//give them 3 seconds between mode changes.
 				return
-			if(!istype(usr.equipped(),/obj/item/weapon/gun))
+			if(!istype(usr.get_active_hand(),/obj/item/weapon/gun))
 				usr << "You need your gun in your active hand to do that!"
 				return
 			usr.client.AllowTargetClick()
@@ -537,7 +542,7 @@
 		if("Disallow Item Use")
 			if(gun_click_time > world.time - 30)	//give them 3 seconds between mode changes.
 				return
-			if(!istype(usr.equipped(),/obj/item/weapon/gun))
+			if(!istype(usr.get_active_hand(),/obj/item/weapon/gun))
 				usr << "You need your gun in your active hand to do that!"
 				return
 			usr.client.AllowTargetClick()
@@ -808,8 +813,8 @@
 /obj/screen/inventory/Click()
 	// At this point in client Click() code we have passed the 1/10 sec check and little else
 	// We don't even know if it's a middle click
-	if(world.time <= usr.next_move)
-		return 1
+	if(usr.attack_delayer.blocked())
+		return
 	if(usr.stat || usr.paralysis || usr.stunned || usr.weakened)
 		return 1
 	if (istype(usr.loc,/obj/mecha)) // stops inventory actions in a mech
@@ -833,5 +838,5 @@
 			if(usr.attack_ui(slot_id))
 				usr.update_inv_l_hand(0)
 				usr.update_inv_r_hand(0)
-				usr.next_move = world.time+6
+				usr.delayNextAttack(6)
 	return 1

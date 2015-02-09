@@ -12,7 +12,7 @@
 	_color = "engineering" //Determines used sprites: rig[on]-[_color] and rig[on]-[_color]2 (lying down sprite)
 	action_button_name = "Toggle Helmet Light"
 	heat_protection = HEAD
-	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECITON_TEMPERATURE
+	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECTION_TEMPERATURE
 
 /obj/item/clothing/head/helmet/space/rig/attack_self(mob/user)
 	if(!isturf(user.loc))
@@ -47,7 +47,7 @@
 	armor = list(melee = 40, bullet = 5, laser = 20,energy = 5, bomb = 35, bio = 100, rad = 80)
 	allowed = list(/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/weapon/storage/bag/ore,/obj/item/device/t_scanner,/obj/item/weapon/pickaxe, /obj/item/weapon/rcd, /obj/item/weapon/wrench/socket)
 	heat_protection = UPPER_TORSO|LOWER_TORSO|LEGS|FEET|ARMS|HANDS
-	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECITON_TEMPERATURE
+	max_heat_protection_temperature = SPACE_SUIT_MAX_HEAT_PROTECTION_TEMPERATURE
 
 //Chief Engineer's rig
 /obj/item/clothing/head/helmet/space/rig/elite
@@ -57,8 +57,13 @@
 	item_state = "ce_helm"
 	_color = "white"
 	species_restricted = list("exclude","Vox")
+<<<<<<< HEAD
 	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECITON_TEMPERATURE
 	flags = FPRINT | TABLEPASS | HEADCOVERSEYES | BLOCKHAIR | STOPSPRESSUREDMAGE | PLASMAGUARD
+=======
+	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECTION_TEMPERATURE
+	flags = FPRINT  | BLOCKHAIR | STOPSPRESSUREDMG | PLASMAGUARD
+>>>>>>> 4efb7bec4f7a0bfa8aa193c41c700b9df949d7b5
 
 /obj/item/clothing/suit/space/rig/elite
 	icon_state = "rig-white"
@@ -66,8 +71,13 @@
 	species_restricted = list("exclude","Vox")
 	desc = "An advanced suit that protects against hazardous, low pressure environments. Shines with a high polish."
 	item_state = "ce_hardsuit"
+<<<<<<< HEAD
 	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECITON_TEMPERATURE
 	flags = FPRINT | TABLEPASS | HEADCOVERSEYES | BLOCKHAIR | STOPSPRESSUREDMAGE | PLASMAGUARD
+=======
+	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE
+	flags = FPRINT  | STOPSPRESSUREDMG | PLASMAGUARD
+>>>>>>> 4efb7bec4f7a0bfa8aa193c41c700b9df949d7b5
 
 
 //Mining rig
@@ -107,12 +117,12 @@
 		camera.network = list("NUKE")
 		cameranet.removeCamera(camera)
 		camera.c_tag = user.name
-		user << "\blue User scanned as [camera.c_tag]. Camera activated."
+		user << "<span class='notice'>User scanned as [camera.c_tag]. Camera activated.</span>"
 
-/obj/item/clothing/head/helmet/space/rig/syndi/examine()
+/obj/item/clothing/head/helmet/space/rig/syndi/examine(mob/user)
 	..()
-	if(get_dist(usr,src) <= 1)
-		usr << "This helmet has a built-in camera. It's [camera ? "" : "in"]active."
+	if(get_dist(user,src) <= 1)
+		user << "<span class='info'>This helmet has a built-in camera. It's [camera ? "" : "in"]active.</span>"
 
 /obj/item/clothing/suit/space/rig/syndi
 	icon_state = "rig-syndi"
@@ -203,9 +213,14 @@
 	item_state = "atmos_helm"
 	_color = "atmos"
 	species_restricted = list("exclude","Vox")
+	flags = FPRINT  | BLOCKHAIR | STOPSPRESSUREDMG | PLASMAGUARD
 	armor = list(melee = 40, bullet = 0, laser = 0, energy = 0, bomb = 25, bio = 100, rad = 0)
+<<<<<<< HEAD
 	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECITON_TEMPERATURE
 	flags = FPRINT | TABLEPASS | HEADCOVERSEYES | BLOCKHAIR | STOPSPRESSUREDMAGE | PLASMAGUARD
+=======
+	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECTION_TEMPERATURE
+>>>>>>> 4efb7bec4f7a0bfa8aa193c41c700b9df949d7b5
 
 /obj/item/clothing/suit/space/rig/atmos
 	desc = "A special suit that protects against hazardous low pressure environments. Has reduced radiation shielding to allow for greater mobility."
@@ -213,15 +228,20 @@
 	name = "atmos hardsuit"
 	item_state = "atmos_hardsuit"
 	species_restricted = list("exclude","Vox")
+	flags = FPRINT  | STOPSPRESSUREDMG | PLASMAGUARD
 	armor = list(melee = 40, bullet = 0, laser = 0, energy = 0, bomb = 25, bio = 100, rad = 0)
+<<<<<<< HEAD
 	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECITON_TEMPERATURE
 	flags = FPRINT | TABLEPASS | HEADCOVERSEYES | BLOCKHAIR | STOPSPRESSUREDMAGE | PLASMAGUARD
+=======
+	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE
+>>>>>>> 4efb7bec4f7a0bfa8aa193c41c700b9df949d7b5
 
 //Firefighting/Atmos RIG (old /vg/)
 /obj/item/clothing/head/helmet/space/rig/atmos/gold
 	desc = "A special helmet designed for work in hazardous low pressure environments and extreme temperatures. In other words, perfect for atmos."
 	heat_protection = HEAD
-	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECITON_TEMPERATURE*2
+	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECTION_TEMPERATURE*2
 	name = "atmos hardsuit helmet"
 	icon_state = "rig0-atmos_gold"
 	item_state = "atmos_gold_helm"
@@ -233,7 +253,7 @@
 /obj/item/clothing/suit/space/rig/atmos/gold
 	desc = "A special suit that protects against hazardous low pressure environments and extreme temperatures. In other words, perfect for atmos."
 	heat_protection = UPPER_TORSO|LOWER_TORSO|LEGS|FEET|ARMS|HANDS
-	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECITON_TEMPERATURE*4
+	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE*4
 	gas_transfer_coefficient = 0.80
 	permeability_coefficient = 0.25
 	icon_state = "rig-atmos_gold"
@@ -282,3 +302,29 @@
 	species_restricted = list("exclude","Vox")//HET
 	armor = list(melee = 40, bullet = 30, laser = 30, energy = 15, bomb = 35, bio = 100, rad = 20)
 	allowed = list(/obj/item/weapon/gun,/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/weapon/melee/)
+
+
+//Death squad rig
+/obj/item/clothing/head/helmet/space/rig/deathsquad
+	name = "deathsquad helmet"
+	desc = "That's not red paint. That's real blood."
+	icon_state = "rig0-deathsquad"
+	item_state = "rig0-deathsquad"
+	armor = list(melee = 65, bullet = 55, laser = 35,energy = 20, bomb = 40, bio = 100, rad = 60)
+	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECTION_TEMPERATURE
+	siemens_coefficient = 0.2
+	species_restricted = list("exclude","Vox")
+	_color = "deathsquad"
+	flags = FPRINT | BLOCKHAIR | STOPSPRESSUREDMG | PLASMAGUARD
+
+/obj/item/clothing/suit/space/rig/deathsquad
+	name = "deathsquad suit"
+	desc = "A heavily armored suit that protects against a lot of things. Used in special operations."
+	icon_state = "rig-deathsquad"
+	item_state = "rig-deathsquad"
+	allowed = list(/obj/item/weapon/gun,/obj/item/ammo_storage,/obj/item/ammo_casing,/obj/item/weapon/melee/baton,/obj/item/weapon/handcuffs,/obj/item/weapon/tank/emergency_oxygen,/obj/item/weapon/tank/emergency_nitrogen,/obj/item/weapon/pinpointer,/obj/item/weapon/shield/energy,/obj/item/weapon/plastique,/obj/item/weapon/disk/nuclear)
+	armor = list(melee = 80, bullet = 60, laser = 50,energy = 25, bomb = 60, bio = 100, rad = 60)
+	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE
+	siemens_coefficient = 0.5
+	species_restricted = list("exclude","Vox")
+	flags = FPRINT | STOPSPRESSUREDMG | PLASMAGUARD

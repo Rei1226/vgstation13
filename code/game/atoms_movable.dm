@@ -6,6 +6,7 @@
 
 	layer = 3
 	var/last_move = null
+	var/languages = ALL
 	var/anchored = 0
 	var/move_speed = 10
 	var/l_move_time = 1
@@ -19,8 +20,12 @@
 	var/area/areaMaster
 
 	// Garbage collection (controller).
-	var/gcDestroyed
-	var/timeDestroyed
+	//var/gcDestroyed
+	//var/timeDestroyed
+
+	var/sound_override = 0 //Do we make a sound when bumping into something?
+	var/hard_deleted = 0
+	//glide_size = 8
 
 /atom/movable/New()
 	. = ..()
@@ -30,14 +35,43 @@
 	gcDestroyed = "bye world!"
 	tag = null
 	loc = null
+	if(istype(beams) && beams.len)
+		for(var/obj/effect/beam/B in beams)
+			if(B && B.target == src)
+				B.target = null
+			if(B.master && B.master.target == src)
+				B.master.target = null
+		beams.len = 0
 	..()
 
+/proc/delete_profile(var/type, soft = 0)
+	switch(soft)
+		if(0)
+			if(!("[type]" in del_profiling))
+				del_profiling["[type]"] = 0
+			del_profiling["[type]"] += 1
+		if(1)
+			if(!("[type]" in gdel_profiling))
+				gdel_profiling["[type]"] = 0
+			gdel_profiling["[type]"] += 1
+		if(2)
+			if(!("[type]" in ghdel_profiling))
+				ghdel_profiling["[type]"] = 0
+			ghdel_profiling["[type]"] += 1
 /atom/movable/Del()
+	if(!ticker || ticker.current_state != 3)
+		return ..()
 	// Pass to Destroy().
 	if(!gcDestroyed)
+		delete_profile("[type]",0)
 		Destroy()
-
+	else
+		if(hard_deleted)
+			delete_profile("[type]",2)
+		else
+			delete_profile("[type]",1)
 	..()
+
 
 // Used in shuttle movement and AI eye stuff.
 // Primarily used to notify objects being moved by a shuttle/bluespace fuckup.
@@ -47,19 +81,48 @@
 	// Update on_moved listeners.
 	INVOKE_EVENT(on_moved,list("loc"=loc))
 
-/atom/movable/Move(NewLoc,Dir=0,step_x=0,step_y=0)
-	var/atom/A = src.loc
-	. = ..()
+/atom/movable/Move(newLoc,Dir=0,step_x=0,step_y=0)
+	if(!loc || !newLoc)
+		return 0
+	var/atom/oldloc = loc
+	if((bound_height != 32 || bound_width != 32) && (loc == newLoc))
+		return ..()
+	if(loc != newLoc)
+		if (!(Dir & (Dir - 1))) //Cardinal move
+			. = ..()
+		else //Diagonal move, split it into cardinal moves
+			if (Dir & 1)
+				if (Dir & 4)
+					if (step(src, NORTH))
+						. = step(src, EAST)
+					else if (step(src, EAST))
+						. = step(src, NORTH)
+				else if (Dir & 8)
+					if (step(src, NORTH))
+						. = step(src, WEST)
+					else if (step(src, WEST))
+						. = step(src, NORTH)
+			else if (Dir & 2)
+				if (Dir & 4)
+					if (step(src, SOUTH))
+						. = step(src, EAST)
+					else if (step(src, EAST))
+						. = step(src, SOUTH)
+				else if (Dir & 8)
+					if (step(src, SOUTH))
+						. = step(src, WEST)
+					else if (step(src, WEST))
+						. = step(src, SOUTH)
 
+	if(!loc || (loc == oldloc && oldloc != newLoc))
+		last_move = 0
+		return
+
+	last_move = Dir
 	src.move_speed = world.timeofday - src.l_move_time
 	src.l_move_time = world.timeofday
-	src.m_flag = 1
-	if ((A != src.loc && A && A.z == src.z))
-		src.last_move = get_dir(A, src.loc)
-
 	// Update on_moved listeners.
-	INVOKE_EVENT(on_moved,list("loc"=NewLoc))
-
+	INVOKE_EVENT(on_moved,list("loc"=newLoc))
 	return .
 
 /atom/movable/proc/recycle(var/datum/materials/rec)
@@ -89,6 +152,9 @@
 
 		loc = destination
 		loc.Entered(src)
+		if(isturf(destination))
+			var/area/A = get_area_master(destination)
+			A.Entered(src)
 
 		for(var/atom/movable/AM in loc)
 			AM.Crossed(src)
@@ -112,8 +178,10 @@
 					src.throw_impact(A,speed)
 					src.throwing = 0
 
-/atom/movable/proc/throw_at(atom/target, range, speed)
+/atom/movable/proc/throw_at(atom/target, range, speed, override = 1)
 	if(!target || !src)	return 0
+	if(override)
+		sound_override = 1
 	//use a modified version of Bresenham's algorithm to get from the atom's current position to that of the target
 
 	throwing = 1
@@ -215,7 +283,7 @@
 
 /atom/movable/overlay/New()
 	. = ..()
-	verbs.Cut()
+	verbs.len = 0
 
 /atom/movable/overlay/attackby(a, b)
 	if (src.master)

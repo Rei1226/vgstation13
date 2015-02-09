@@ -24,7 +24,7 @@
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "baton"
 	item_state = "classic_baton"
-	flags = FPRINT | TABLEPASS
+	flags = FPRINT
 	slot_flags = SLOT_BELT
 	force = 10
 
@@ -77,7 +77,7 @@
 	icon = 'icons/obj/weapons.dmi'
 	icon_state = "telebaton_0"
 	item_state = "telebaton_0"
-	flags = FPRINT | TABLEPASS
+	flags = FPRINT
 	slot_flags = SLOT_BELT
 	w_class = 2
 	force = 3
@@ -108,12 +108,13 @@
 	add_fingerprint(user)
 
 	if(blood_overlay)							//updates blood overlay, if any
-		overlays.Cut()//this might delete other item overlays as well but eeeeeeeh
+		overlays.len = 0//this might delete other item overlays as well but eeeeeeeh
 
 		var/icon/I = new /icon(src.icon, src.icon_state)
 		I.Blend(new /icon('icons/effects/blood.dmi', rgb(255,255,255)),ICON_ADD)
 		I.Blend(new /icon('icons/effects/blood.dmi', "itemblood"),ICON_MULTIPLY)
-		blood_overlay = I
+		blood_overlay = image(I)
+		blood_overlay = blood_color
 
 		overlays += blood_overlay
 

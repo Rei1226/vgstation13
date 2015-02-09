@@ -4,7 +4,6 @@
 
 var/global/datum/controller/game_controller/master_controller //Set in world.New()
 
-var/global/last_tick_timeofday = world.timeofday
 var/global/last_tick_duration = 0
 
 var/global/air_processing_killed = 0
@@ -60,11 +59,11 @@ datum/controller/game_controller/New()
 
 	if(!syndicate_code_phrase)		syndicate_code_phrase	= generate_code_phrase()
 	if(!syndicate_code_response)	syndicate_code_response	= generate_code_phrase()
-	if(!emergency_shuttle)			emergency_shuttle = new /datum/shuttle_controller/emergency_shuttle()
-
+	/*if(!emergency_shuttle)			emergency_shuttle = new /datum/shuttle_controller/emergency_shuttle()*/
+/*
 	if(global.garbageCollector)
 		garbageCollector = global.garbageCollector
-
+*/
 datum/controller/game_controller/proc/setup()
 	world.tick_lag = config.Ticklag
 
@@ -73,7 +72,7 @@ datum/controller/game_controller/proc/setup()
 	socket_talk.send_raw("type=startup")
 
 	createRandomZlevel()
-
+/*
 	if(!air_master)
 		air_master = new /datum/controller/air_system()
 		air_master.Setup()
@@ -84,7 +83,7 @@ datum/controller/game_controller/proc/setup()
 	if(!global.garbageCollector)
 		global.garbageCollector = new
 		garbageCollector = global.garbageCollector
-
+*/
 	setup_objects()
 	setupgenetics()
 	setupfactions()
@@ -96,17 +95,22 @@ datum/controller/game_controller/proc/setup()
 
 	//if(config.socket_talk)
 	//	keepalive()
-
+/*
 	spawn(0)
 		if(ticker)
 			ticker.pregame()
 
 	lighting_controller.Initialize()
+*/
 
 datum/controller/game_controller/proc/setup_objects()
 	world << "\red \b Initializing objects"
 	sleep(-1)
+	//var/last_init_type = null
 	for(var/atom/movable/object in world)
+		//if(last_init_type != object.type)
+		//	testing("Initializing [object.type]")
+		//	last_init_type = object.type
 		object.initialize()
 
 
@@ -138,10 +142,6 @@ datum/controller/game_controller/proc/setup_objects()
 		while (1) // Far more efficient than recursively calling ourself.
 			if (isnull(failsafe))
 				new /datum/controller/failsafe()
-
-			var/currenttime = world.timeofday
-			last_tick_duration = (currenttime - last_tick_timeofday) / 10
-			last_tick_timeofday = currenttime
 
 			if (processing)
 				iteration++
@@ -257,7 +257,7 @@ datum/controller/game_controller/proc/setup_objects()
 
 datum/controller/game_controller/proc/processMobs()
 	var/i = 1
-	expensive_mobs.Cut()
+	expensive_mobs.len = 0
 	while(i<=mob_list.len)
 		var/mob/M = mob_list[i]
 		if(M)
@@ -268,7 +268,8 @@ datum/controller/game_controller/proc/processMobs()
 				expensive_mobs += M
 			i++
 			continue
-		mob_list.Cut(i,i+1)
+		if(!mob_list.Remove(null))
+			mob_list.Cut(i,i+1)
 
 /datum/controller/game_controller/proc/processDiseases()
 	for (var/datum/disease/Disease in active_diseases)
@@ -281,7 +282,7 @@ datum/controller/game_controller/proc/processMobs()
 
 /datum/controller/game_controller/proc/processMachines()
 	#ifdef PROFILE_MACHINES
-	machine_profiling.Cut()
+	machine_profiling.len = 0
 	#endif
 
 	for (var/obj/machinery/Machinery in machines)

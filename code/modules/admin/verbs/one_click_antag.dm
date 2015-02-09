@@ -265,7 +265,8 @@ client/proc/one_click_antag()
 				if(synd_mind.current.client)
 					for(var/image/I in synd_mind.current.client.images)
 						if(I.icon_state == "synd")
-							del(I)
+							//del(I)
+							synd_mind.current.client.images -= I
 
 		for(var/datum/mind/synd_mind in ticker.mode.syndicates)
 			if(synd_mind.current)
@@ -455,7 +456,7 @@ client/proc/one_click_antag()
 	new_vox.dna.mutantrace = "vox"
 	new_vox.set_species("Vox") // Actually makes the vox! How about that.
 	new_vox.generate_name()
-	new_vox.add_language("Vox-pidgin")
+	//new_vox.add_language("Vox-pidgin")
 	new_vox.mind_initialize()
 	new_vox.mind.assigned_role = "MODE"
 	new_vox.mind.special_role = "Vox Raider"

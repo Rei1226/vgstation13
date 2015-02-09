@@ -193,6 +193,8 @@
 		return
 
 	if (istype(W, /obj/item/device/core_sampler))
+		if(!geologic_data)
+			geologic_data = new/datum/geosample(src)
 		geologic_data.UpdateNearbyArtifactInfo(src)
 		var/obj/item/device/core_sampler/C = W
 		C.sample_item(src, user)
@@ -405,8 +407,8 @@
 				R.amount = rand(1,5)
 
 			if(3)
-				var/obj/item/stack/sheet/metal/R = new(src)
-				R.amount = rand(5,25)
+				var/obj/item/stack/sheet/metal/M = getFromPool(/obj/item/stack/sheet/metal, (src))
+				M.amount = rand(5,25)
 
 			if(4)
 				var/obj/item/stack/sheet/plasteel/R = new(src)
@@ -489,6 +491,12 @@
 		if(do_after(user, used_digging.digspeed) && user) //the better the drill, the faster the digging
 			user << "<span class='notice'>You dug a hole.</span>"
 			gets_dug()
+	if (istype(W, /obj/item/stack/tile/plasteel))
+		var/obj/item/stack/tile/plasteel/S = W
+		playsound(get_turf(src), 'sound/weapons/Genhit.ogg', 50, 1)
+		S.build(src)
+		S.use(1)
+		return
 
 	if(istype(W,/obj/item/weapon/storage/bag/ore))
 		var/obj/item/weapon/storage/bag/ore/S = W
@@ -515,7 +523,7 @@
 	return
 
 /turf/unsimulated/floor/asteroid/proc/updateMineralOverlays()
-	src.overlays.Cut()
+	src.overlays.len = 0
 
 	if(istype(get_step(src, NORTH), /turf/unsimulated/mineral))
 		src.overlays += image('icons/turf/walls.dmi', "rock_side_n")
@@ -835,7 +843,7 @@
 		return ..()
 
 /turf/unsimulated/mineral/gibtonite/attackby(obj/item/I, mob/user)
-	if(istype(I, /obj/item/device/mining_scanner) && stage == 1)
+	if(((istype(I, /obj/item/device/mining_scanner)) || (istype(I, /obj/item/device/depth_scanner))) && stage == 1)
 		user.visible_message("<span class='notice'>You use [I] to locate where to cut off the chain reaction and attempt to stop it...</span>")
 		defuse()
 	if(istype(I, /obj/item/weapon/pickaxe))
@@ -887,7 +895,7 @@
 		mineral.result_amount = 0
 		explosion(bombturf,1,2,5, adminlog = 0)
 	if(stage == 2) //Gibtonite deposit is now benign and extractable. Depending on how close you were to it blowing up before defusing, you get better quality ore.
-		var/obj/item/weapon/twohanded/required/gibtonite/G = new /obj/item/weapon/twohanded/required/gibtonite/(src)
+		var/obj/item/weapon/gibtonite/G = new /obj/item/weapon/gibtonite/(src)
 		if(det_time <= 0)
 			G.quality = 3
 			G.icon_state = "Gibtonite ore 3"

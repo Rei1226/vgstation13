@@ -1,7 +1,6 @@
 /mob/living/captive_brain
 	name = "host brain"
 	real_name = "host brain"
-	universal_understand=1
 
 /mob/living/captive_brain/say(var/message)
 
@@ -88,8 +87,8 @@ var/global/borer_chem_types = typesof(/datum/borer_chem) - /datum/borer_chem
 	friendly = "prods"
 	wander = 0
 	pass_flags = PASSTABLE
+	languages = ALL
 
-	universal_understand=1
 
 	var/chemicals = 10                      // Chemicals used for reproduction and spitting neurotoxin.
 	var/mob/living/carbon/human/host        // Human host for the brain worm.
@@ -240,15 +239,13 @@ var/global/borer_chem_types = typesof(/datum/borer_chem) - /datum/borer_chem
 
 /mob/living/simple_animal/borer/Stat()
 	..()
-	statpanel("Status")
+	if(statpanel("Status"))
+		if(emergency_shuttle)
+			if(emergency_shuttle.online && emergency_shuttle.location < 2)
+				var/timeleft = emergency_shuttle.timeleft()
+				if (timeleft)
+					stat(null, "ETA-[(timeleft / 60) % 60]:[add_zero(num2text(timeleft % 60), 2)]")
 
-	if(emergency_shuttle)
-		if(emergency_shuttle.online && emergency_shuttle.location < 2)
-			var/timeleft = emergency_shuttle.timeleft()
-			if (timeleft)
-				stat(null, "ETA-[(timeleft / 60) % 60]:[add_zero(num2text(timeleft % 60), 2)]")
-
-	if (client.statpanel == "Status")
 		stat("Chemicals", chemicals)
 
 // VERBS!
@@ -526,7 +523,7 @@ mob/living/simple_animal/borer/proc/detach()
 
 	if(istype(M,/mob/living/carbon/human))
 		var/mob/living/carbon/human/H = M
-		if(H.check_head_coverage(HIDEEARS))
+		if(H.check_body_part_coverage(EARS))
 			src << "You cannot get through that host's protective gear."
 			return
 

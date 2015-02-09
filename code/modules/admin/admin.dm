@@ -138,7 +138,7 @@ var/global/floorIsLava = 0
 				body += "<A href='?src=\ref[src];makeanimal=\ref[M]'>Animalize</A> | "
 
 			// DNA2 - Admin Hax
-			if(iscarbon(M) && !isalien(M))
+			if(iscarbon(M) && !isbrain(M) && !isalien(M))
 				body += "<br><br>"
 				body += "<b>DNA Blocks:</b><br><table border='0'><tr><th>&nbsp;</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>"
 				var/bname
@@ -208,7 +208,7 @@ var/global/floorIsLava = 0
 		</body></html>
 	"}
 
-	usr << browse(body, "window=adminplayeropts;size=550x515")
+	usr << browse(body, "window=adminplayeropts-\ref[M];size=550x515")
 	feedback_add_details("admin_verb","SPP") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 
@@ -737,8 +737,10 @@ var/global/floorIsLava = 0
 			<A href='?src=\ref[src];secretsfun=whiteout'>Fix all lights</A><BR>
 			<A href='?src=\ref[src];secretsfun=floorlava'>The floor is lava! (DANGEROUS: extremely lame)</A><BR>
 			<A href='?src=\ref[src];secretsfun=togglenarsie'>Toggle Nar-Sie's behaviour</A><BR>
+			<A href='?src=\ref[src];secretsfun=fakealerts'>Trigger a fake alert</A><BR>
+			<A href='?src=\ref[src];secretsfun=fakebooms'>Adds in some Micheal Bay to the shift without major destruction</A><BR>
 			<BR>
-			<B>Final Soloutions</B><BR>
+			<B>Final Solutions</B><BR>
 			<I>(Warning, these will end the round!)</I><BR>
 			<BR>
 			<A href='?src=\ref[src];secretsfun=hellonearth'>Summon Nar-Sie</A><BR>
@@ -940,9 +942,17 @@ var/global/floorIsLava = 0
 
 	if(!check_rights(R_ADMIN))	return
 	if (!ticker || ticker.current_state != GAME_STATE_PREGAME)
+		if(ticker.delay_end == 2)
+			world << "<font size=4><span class='danger'>World Reboot triggered by [key_name(usr)]!</font></span>"
+			log_admin("<font size=4><span class='danger'>World Reboot triggered by [key_name(usr)]!</font></span>")
+			if(watchdog.waiting)
+				watchdog.signal_ready()
+			else
+				world.Reboot()
 		ticker.delay_end = !ticker.delay_end
 		log_admin("[key_name(usr)] [ticker.delay_end ? "delayed the round end" : "has made the round end normally"].")
 		message_admins("\blue [key_name(usr)] [ticker.delay_end ? "delayed the round end" : "has made the round end normally"].", 1)
+
 		return //alert("Round end delayed", null, null, null, null, null)
 	if (!( going ))
 		going = LOBBY_TICKING_RESTARTED
@@ -1288,23 +1298,29 @@ proc/move_alien_ship()
 		alien_ship_location = 1
 	return
 
-proc/formatJumpTo(var/location,var/where="")
+proc/formatJumpTo(location, where = "")
 	var/turf/loc
-	if(istype(location,/turf/))
+
+	if (isturf(location))
 		loc = location
 	else
 		loc = get_turf(location)
-	if(where=="")
-		where=formatLocation(loc)
+
+	if (where == "")
+		where = formatLocation(loc)
+
 	return "<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[loc.x];Y=[loc.y];Z=[loc.z]'>[where]</a>"
 
-proc/formatLocation(var/location)
+proc/formatLocation(location)
 	var/turf/loc
-	if(istype(location,/turf/))
+
+	if (isturf(location))
 		loc = location
 	else
 		loc = get_turf(location)
+
 	var/area/A = get_area(location)
+
 	return "[A.name] - [loc.x],[loc.y],[loc.z]"
 
 proc/formatPlayerPanel(var/mob/U,var/text="PP")

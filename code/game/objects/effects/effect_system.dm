@@ -11,7 +11,7 @@ would spawn and follow the beaker, even if it is carried or thrown.
 	icon = 'icons/effects/effects.dmi'
 	mouse_opacity = 0
 	unacidable = 1 // so effect are not targeted by alien acid.
-	flags = TABLEPASS
+	flags = 0
 	w_type=NOT_RECYCLABLE
 
 /obj/effect/effect/water
@@ -71,6 +71,9 @@ would spawn and follow the beaker, even if it is carried or thrown.
 		holder = atom
 
 	proc/start()
+
+/obj/effect/canSingulothPull(var/obj/machinery/singularity/singulo)
+	return 0
 
 /////////////////////////////////////////////
 // GENERIC STEAM SPREAD SYSTEM
@@ -235,6 +238,12 @@ steam.start() -- spawns the effect
 		return 0
 	return 1
 
+/obj/effect/effect/smoke/Destroy()
+	if(reagents)
+		reagents.my_atom = null
+		reagents = null
+	..()
+
 /////////////////////////////////////////////
 // Bad smoke
 /////////////////////////////////////////////
@@ -375,6 +384,11 @@ steam.start() -- spawns the effect
 /obj/effect/effect/smoke/chem
 	icon = 'icons/effects/chemsmoke.dmi'
 
+/obj/effect/effect/smoke/Destroy()
+	if(reagents)
+		qdel(reagents)
+		reagents = null
+	..()
 /obj/effect/effect/smoke/chem/New()
 	. = ..()
 	create_reagents(500)
@@ -474,7 +488,9 @@ steam.start() -- spawns the effect
 					sleep(10)
 					step(smoke,direction)
 				spawn(150+rand(10,30))
-					if(smoke) qdel(smoke)
+					if(smoke)
+						qdel(smoke)
+						smoke = null
 					src.total_smoke--
 
 // Goon compat.
@@ -730,6 +746,7 @@ steam.start() -- spawns the effect
 		flick("[icon_state]-disolve", src)
 		sleep(5)
 		qdel(src)
+	AddToProfiler()
 
 /obj/effect/effect/foam/fire/process()
 	if(--amount < 0)
@@ -885,7 +902,7 @@ steam.start() -- spawns the effect
 		return
 
 	attack_hand(var/mob/user)
-		user.changeNext_move(10)
+		user.delayNextAttack(10)
 		if ((M_HULK in user.mutations) || (prob(75 - metal*25)))
 			user << "\blue You smash through the metal foam wall."
 			for(var/mob/O in oviewers(user))
@@ -898,7 +915,7 @@ steam.start() -- spawns the effect
 
 
 	attackby(var/obj/item/I, var/mob/user)
-		user.changeNext_move(10)
+		user.delayNextAttack(10)
 		if (istype(I, /obj/item/weapon/grab))
 			var/obj/item/weapon/grab/G = I
 			G.affecting.loc = src.loc

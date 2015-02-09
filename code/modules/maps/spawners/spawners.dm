@@ -143,8 +143,8 @@
 	amount = 2
 	chance = 75
 	toSpawn = list(
-		/obj/item/stack/sheet/glass{amount=50},
-		/obj/item/stack/sheet/rglass{amount=50},
+		/obj/item/stack/sheet/glass/glass{amount=50},
+		/obj/item/stack/sheet/glass/rglass{amount=50},
 		/obj/item/stack/sheet/glass/plasmaglass{amount=50},
 		/obj/item/stack/light_w{amount=50},
 		/obj/item/stack/sheet/mineral/plastic{amount=50},
@@ -268,7 +268,7 @@
 	amount = 2
 	chance = 50
 	toSpawn = list(
-		/obj/item/stack/sheet/glass{amount=50},
+		/obj/item/stack/sheet/glass/glass{amount=50},
 		/obj/item/stack/sheet/leather{amount=50},
 		/obj/item/stack/sheet/mineral/plastic{amount=50},
 		/obj/item/stack/sheet/metal{amount=50},
@@ -593,7 +593,7 @@
 	icon_state = "space_weapons"
 	chance = 20
 	toSpawn = list(
-		/obj/item/weapon/butch/meatcleaver,
+		/obj/item/weapon/kitchen/utensil/knife/large/butch/meatcleaver,
 		/obj/item/weapon/crossbow,
 		/obj/item/weapon/grenade/spawnergrenade/manhacks,
 		/obj/item/weapon/grenade/spawnergrenade/spesscarp,

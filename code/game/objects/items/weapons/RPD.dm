@@ -135,7 +135,8 @@ var/global/list/RPD_recipes=list(
 	opacity = 0
 	density = 0
 	anchored = 0.0
-	flags = FPRINT | TABLEPASS| CONDUCT
+	flags = FPRINT
+	siemens_coefficient = 1
 	force = 10.0
 	throwforce = 10.0
 	throw_speed = 1
@@ -476,6 +477,8 @@ var/global/list/RPD_recipes=list(
 		return 0
 	if(istype(A,/area/shuttle)||istype(A,/turf/space/transit))
 		return 0
+	if(istype(A, /obj/structure/lattice))
+		A = get_turf(A)
 
 	switch(p_class)
 		if(-2) // Paint pipes

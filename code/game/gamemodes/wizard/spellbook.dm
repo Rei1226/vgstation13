@@ -6,7 +6,7 @@
 	throw_speed = 1
 	throw_range = 5
 	w_class = 1.0
-	flags = FPRINT | TABLEPASS
+	flags = FPRINT
 	var/uses = 5
 	var/temp = null
 	var/max_uses = 5
@@ -377,7 +377,7 @@
 /obj/item/weapon/spellbook/oneuse/fireball/recoil(mob/user as mob)
 	..()
 	explosion(user.loc, -1, 0, 2, 3, 0, flame_range = 2)
-	del(src)
+	qdel(src)
 
 /obj/item/weapon/spellbook/oneuse/smoke
 	spell = /obj/effect/proc_holder/spell/targeted/smoke
@@ -499,7 +499,7 @@
 		magichead.voicechange = 1	//NEEEEIIGHH
 		user.drop_from_inventory(user.wear_mask)
 		user.equip_to_slot_if_possible(magichead, slot_wear_mask, 1, 1)
-		del(src)
+		qdel(src)
 	else
 		user <<"<span class='notice'>I say thee neigh</span>"
 

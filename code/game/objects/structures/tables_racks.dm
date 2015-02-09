@@ -239,7 +239,7 @@
 	if(M_HULK in user.mutations)
 		user.say(pick(";RAAAAAAAARGH!", ";HNNNNNNNNNGGGGGGH!", ";GWAAAAAAAARRRHHH!", "NNNNNNNNGGGGGGGGHH!", ";AAAAAAARRRGH!" ))
 		visible_message("<span class='danger'>[user] smashes the [src] apart!</span>")
-		user.changeNext_move(8)
+		user.delayNextAttack(8)
 		destroy()
 
 
@@ -614,8 +614,7 @@
 		return
 	if(isrobot(user))
 		return
-	user.drop_item()
-	if(W && W.loc)	W.loc = src.loc
+	user.drop_item(src)
 	return 1
 
 /obj/structure/rack/meteorhit(obj/O as obj)

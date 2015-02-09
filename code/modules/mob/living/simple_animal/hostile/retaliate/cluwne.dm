@@ -172,6 +172,7 @@
 	return 0
 
 
+/*
 /mob/living/simple_animal/hostile/retaliate/cluwne/attackby(var/obj/item/O as obj, var/mob/user as mob)
 	..()
 	hostile = 1
@@ -180,6 +181,7 @@
 			var/mob/living/simple_animal/hostile/retaliate/cluwne/C = Z
 			C.hostile = 1
 	return 0
+*/
 
 /mob/living/simple_animal/hostile/retaliate/cluwne/attack_alien(mob/living/carbon/alien/humanoid/M as mob)
 	..()
@@ -245,10 +247,11 @@
 	return ..()
 
 /mob/living/simple_animal/hostile/retaliate/cluwne/attackby(var/obj/item/O as obj, var/mob/user as mob)
+	//only knowledge can kill a cluwne
 	if(istype(O,/obj/item/weapon/book))
 		gib()
 		return
-	if(O.force)
+	/*if(O.force)
 		Retaliate() //alertMode()
 		var/damage = O.force
 		if (O.damtype == HALLOSS)
@@ -257,36 +260,17 @@
 		for(var/mob/M in viewers(src, null))
 			if ((M.client && !( M.blinded )))
 				M.show_message("<span class='warning'><B>[src] has been attacked with the [O] by [user].</B></span>")
-	else
-		user << "<span class='warning'>This weapon is ineffective, it does no damage.</span>"
-		for(var/mob/M in viewers(src, null))
-			if ((M.client && !( M.blinded )))
-				M.show_message("<span class='warning'>[user] gently taps [src] with the [O]. </span>")
+	*/
 
 /mob/living/simple_animal/hostile/retaliate/cluwne/Bump(atom/movable/AM as mob|obj, yes)
-	spawn( 0 )
-		if ((!( yes ) || now_pushing))
-			return
-		if(ismob(AM))
-			src << "<span class='warning'><B>You are too depressed to push [AM] out of \the way.</B></span>"
-			AM:LAssailant = src
-			return
-		..()
-		if (!( istype(AM, /atom/movable) ))
-			return
-		if (!( now_pushing ))
-			now_pushing = 1
-			if (!( AM.anchored ))
-				var/t = get_dir(src, AM)
-				if (istype(AM, /obj/structure/window))
-					if(AM:ini_dir == NORTHWEST || AM:ini_dir == NORTHEAST || AM:ini_dir == SOUTHWEST || AM:ini_dir == SOUTHEAST)
-						for(var/obj/structure/window/win in get_step(AM,t))
-							now_pushing = 0
-							return
-				step(AM, t)
-			now_pushing = null
+	if ((!( yes ) || now_pushing))
 		return
-	return
+	if(ismob(AM))
+		var/mob/M = AM
+		src << "<span class='danger'>You are too depressed to push [M] out of \the way.</span>"
+		M.LAssailant = src
+		return
+	..()
 
 /mob/living/simple_animal/hostile/retaliate/cluwne/say(var/message)
 	message = filter.FilterSpeech(lowertext(message))

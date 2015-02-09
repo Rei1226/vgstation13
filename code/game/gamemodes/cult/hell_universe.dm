@@ -46,6 +46,10 @@ In short:
 	emergency_shuttle.force_shutdown()
 	*/
 
+	escape_list = get_area_turfs(locate(/area/hallway/secondary/exit))
+
+	suspend_alert = 1
+
 	for(var/area/ca in world)
 		var/area/A=get_area_master(ca)
 		if(!istype(A,/area) || A.name=="Space")
@@ -81,23 +85,22 @@ In short:
 	for(var/turf/space/spess in world)
 		spess.overlays += "hell01"
 
-	for(var/turf/T in world)
-		if(!T.holy && istype(T,/turf/simulated/floor) && prob(1))
+	for(var/turf/simulated/floor/T in world)
+		if(!T.holy && prob(1))
 			new /obj/effect/gateway/active/cult(T)
 
-	for (var/obj/machinery/firealarm/alm in world)
+	for (var/obj/machinery/firealarm/alm in machines)
 		if (!(alm.stat & BROKEN))
 			alm.ex_act(2)
 
-	for (var/obj/machinery/power/apc/APC in world)
+	for (var/obj/machinery/power/apc/APC in power_machines)
 		if (!(APC.stat & BROKEN) && !istype(APC.areaMaster,/area/turret_protected/ai))
 			if(APC.cell)
 				APC.cell.charge = 0
 			APC.emagged = 1
 			APC.queue_icon_update()
-			APC.update()
 
-	for(var/mob/living/simple_animal/M in world)
+	for(var/mob/living/simple_animal/M in mob_list)
 		if(M && !M.client)
 			M.stat = DEAD
 

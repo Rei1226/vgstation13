@@ -6,7 +6,8 @@
 	icon_state = "powersink0"
 	item_state = "electronic"
 	w_class = 4.0
-	flags = FPRINT | TABLEPASS | CONDUCT
+	flags = FPRINT
+	siemens_coefficient = 1
 	throwforce = 5
 	throw_speed = 1
 	throw_range = 2
@@ -109,7 +110,7 @@
 				// found a powernet, so drain up to max power from it
 
 				var/drained = min ( drain_rate, PN.avail )
-				PN.newload += drained
+				PN.load += drained
 				power_drained += drained
 
 				// if tried to drain more than available on powernet

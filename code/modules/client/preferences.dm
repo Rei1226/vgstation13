@@ -142,9 +142,9 @@ var/const/MAX_SAVE_SLOTS = 8
 			if(load_pref)
 				if(load_save_sqlite(C.ckey, src, default_slot))
 					return
-	randomize_appearance_for()
-	real_name = random_name(gender)
-	save_character_sqlite(src, C.ckey, default_slot)
+		randomize_appearance_for()
+		real_name = random_name(gender)
+		save_character_sqlite(src, C.ckey, default_slot)
 
 /datum/preferences
 
@@ -330,6 +330,25 @@ var/const/MAX_SAVE_SLOTS = 8
 		else
 			dat += "[copytext(flavor_text, 1, 37)]...<br>"
 
+
+		if(!isnum(r_hair))
+			WARNING("R_HAIR Expected a number")
+		if(!isnum(g_hair))
+			WARNING("G_HAIR Expected a number")
+		if(!isnum(b_hair))
+			WARNING("B_HAIR Expected a number")
+		if(!isnum(r_facial))
+			WARNING("R_FACIAL Expected a number")
+		if(!isnum(g_facial))
+			WARNING("G_FACIAL Expected a number")
+		if(!isnum(b_facial))
+			WARNING("B_FACIAL Expected a number")
+		if(!isnum(r_eyes))
+			WARNING("R_EYES Expected a number")
+		if(!isnum(g_eyes))
+			WARNING("G_EYES Expected a number")
+		if(!isnum(b_eyes))
+			WARNING("B_EYES Expected a number")
 		// AUTOFIXED BY fix_string_idiocy.py
 		// C:\Users\Rob\Documents\Projects\vgstation13\code\modules\client\preferences.dm:335: dat += "<br>"
 		dat += {"<br>
@@ -1069,13 +1088,17 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 							nanotrasen_relation = new_relation
 
 					if("flavor_text")
-						var/msg = input(usr,"Set the flavor text in your 'examine' verb. This can also be used for OOC notes and preferences!","Flavor Text",html_decode(flavor_text)) as message
+						if(appearance_isbanned(user))
+							src << "<span class = 'notice'>You are appearance banned!</span>"
+							return
+						else
+							var/msg = input(usr,"Set the flavor text in your 'examine' verb. This can also be used for OOC notes and preferences!","Flavor Text",html_decode(flavor_text)) as message
 
-						if(msg != null)
-							msg = copytext(msg, 1, MAX_MESSAGE_LEN)
-							msg = html_encode(msg)
+							if(msg != null)
+								msg = copytext(msg, 1, MAX_MESSAGE_LEN)
+								msg = html_encode(msg)
 
-							flavor_text = msg
+								flavor_text = msg
 
 					if("limbs")
 						var/limb_name = input(user, "Which limb do you want to change?") as null|anything in list("Left Leg","Right Leg","Left Arm","Right Arm","Left Foot","Right Foot","Left Hand","Right Hand")
@@ -1458,7 +1481,7 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 		B.open()
 
 	Topic(href, href_list)
-		if(!usr)
+		if(!usr || !client)
 			return
 		if(client.mob!=usr)
 			usr << "YOU AREN'T ME GO AWAY"

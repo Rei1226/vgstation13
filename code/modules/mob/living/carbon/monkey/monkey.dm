@@ -1,12 +1,18 @@
 /mob/living/carbon/monkey
 	name = "monkey"
 	voice_name = "monkey"
-	speak_emote = list("chimpers")
+	//speak_emote = list("chimpers")
+	languages = MONKEY
 	icon_state = "monkey1"
 	icon = 'icons/mob/monkey.dmi'
 	gender = NEUTER
 	pass_flags = PASSTABLE
 	update_icon = 0		///no need to call regenerate_icon
+
+
+	mob_bump_flag = MONKEY
+	mob_swap_flags = MONKEY|SLIME|SIMPLE_ANIMAL
+	mob_push_flags = MONKEY|SLIME|SIMPLE_ANIMAL|ALIEN
 
 	var/canWearClothes = 1
 	var/canWearHats = 1
@@ -89,21 +95,21 @@
 	..()
 	dna.mutantrace = "lizard"
 	greaterform = "Unathi"
-	add_language("Sinta'unathi")
+	//add_language("Sinta'unathi")
 
 /mob/living/carbon/monkey/skrell/New()
 
 	..()
 	dna.mutantrace = "skrell"
 	greaterform = "Skrell"
-	add_language("Skrellian")
+	//add_language("Skrellian")
 
 /mob/living/carbon/monkey/tajara/New()
 
 	..()
 	dna.mutantrace = "tajaran"
 	greaterform = "Tajaran"
-	add_language("Siik'tajr")
+	//add_language("Siik'tajr")
 
 /mob/living/carbon/monkey/diona/New()
 
@@ -112,7 +118,7 @@
 	gender = NEUTER
 	dna.mutantrace = "plant"
 	greaterform = "Diona"
-	add_language("Rootspeak")
+	//add_language("Rootspeak")
 
 /mob/living/carbon/monkey/show_inv(mob/living/carbon/user as mob)
 	user.set_machine(src)
@@ -170,53 +176,20 @@
 		tally += (283.222 - bodytemperature) / 10 * 1.75
 	return tally+config.monkey_delay
 
-/mob/living/carbon/monkey/Bump(atom/movable/AM as mob|obj, yes)
-
-	spawn( 0 )
-		if ((!( yes ) || now_pushing))
-			return
-		now_pushing = 1
-		if(ismob(AM))
-			var/mob/tmob = AM
-			if(istype(tmob, /mob/living/carbon/human) && (M_HULK in tmob.mutations))
-				if(prob(70))
-					usr << "\red <B>You fail to push [tmob]'s fat ass out of the way.</B>"
-					now_pushing = 0
-					return
-			if(!(tmob.status_flags & CANPUSH))
-				now_pushing = 0
-				return
-
-			tmob.LAssailant = src
-		now_pushing = 0
-		..()
-		if (!( istype(AM, /atom/movable) ))
-			return
-		if (!( now_pushing ))
-			now_pushing = 1
-			if (!( AM.anchored ))
-				var/t = get_dir(src, AM)
-				if (istype(AM, /obj/structure/window/full))
-					for(var/obj/structure/window/win in get_step(AM,t))
-						now_pushing = 0
-						return
-				step(AM, t)
-			now_pushing = null
-		return
-	return
 
 /mob/living/carbon/monkey/proc/wearhat(var/obj/item/clothing/head/H as obj)
 	if(H)
-		var/obj/item/clothing/head/oldhat = null
-		if(hat)
-			oldhat = hat
-			hat = null
-		hat = H
-		usr.drop_item()
-		hat.loc = src
-		regenerate_icons()
-		if (hat)
-			usr.put_in_hands(oldhat)
+		if(istype(H))
+			var/obj/item/clothing/head/oldhat = null
+			if(hat)
+				oldhat = hat
+				hat = null
+			hat = H
+			usr.drop_item()
+			hat.loc = src
+			regenerate_icons()
+			if (hat)
+				usr.put_in_hands(oldhat)
 	else
 		if(hat)
 			usr.put_in_hands(hat)
@@ -225,16 +198,17 @@
 
 /mob/living/carbon/monkey/proc/wearclothes(var/obj/item/clothing/monkeyclothes/C as obj)
 	if(C)
-		var/obj/item/clothing/monkeyclothes/olduniform = null
-		if(uniform)
-			olduniform = uniform
-			uniform = null
-		uniform = C
-		usr.drop_item()
-		uniform.loc = src
-		regenerate_icons()
-		if (olduniform)
-			usr.put_in_hands(olduniform)
+		if(istype(C))
+			var/obj/item/clothing/monkeyclothes/olduniform = null
+			if(uniform)
+				olduniform = uniform
+				uniform = null
+			uniform = C
+			usr.drop_item()
+			uniform.loc = src
+			regenerate_icons()
+			if (olduniform)
+				usr.put_in_hands(olduniform)
 	else
 		if(uniform)
 			usr.put_in_hands(uniform)
@@ -580,14 +554,14 @@
 
 /mob/living/carbon/monkey/Stat()
 	..()
-	statpanel("Status")
-	stat(null, text("Intent: []", a_intent))
-	stat(null, text("Move Mode: []", m_intent))
-	if(client && mind)
-		if (client.statpanel == "Status")
-			if(mind.changeling)
-				stat("Chemical Storage", mind.changeling.chem_charges)
-				stat("Genetic Damage Time", mind.changeling.geneticdamage)
+	if(statpanel("Status"))
+		stat(null, text("Intent: []", a_intent))
+		stat(null, text("Move Mode: []", m_intent))
+		if(client && mind)
+			if (client.statpanel == "Status")
+				if(mind.changeling)
+					stat("Chemical Storage", mind.changeling.chem_charges)
+					stat("Genetic Damage Time", mind.changeling.geneticdamage)
 	return
 
 

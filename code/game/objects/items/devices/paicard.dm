@@ -4,7 +4,7 @@
 	icon_state = "pai"
 	item_state = "electronic"
 	w_class = 2.0
-	flags = FPRINT | TABLEPASS
+	flags = FPRINT
 	slot_flags = SLOT_BELT
 	origin_tech = "programming=2"
 	var/obj/item/device/radio/radio
@@ -129,12 +129,12 @@
 
 /obj/item/device/paicard/proc/removePersonality()
 	src.pai = null
-	src.overlays.Cut()
+	src.overlays.len = 0
 	src.overlays += "pai-off"
 
 /obj/item/device/paicard/proc/setEmotion(var/emotion)
 	if(pai)
-		src.overlays.Cut()
+		src.overlays.len = 0
 		switch(emotion)
 			if(1) src.overlays += "pai-happy"
 			if(2) src.overlays += "pai-cat"

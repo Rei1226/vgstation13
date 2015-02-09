@@ -30,6 +30,9 @@ Pipelines + Other Objects -> Pipe network
 
 	var/list/available_colors
 
+	// Investigation logs
+	var/log
+
 // Find a connecting /obj/machinery/atmospherics in specified direction.
 /obj/machinery/atmospherics/proc/findConnecting(var/direction)
 	for(var/obj/machinery/atmospherics/target in get_step(src,direction))
@@ -75,6 +78,7 @@ Pipelines + Other Objects -> Pipe network
 // Re-enabled for debugging.
 /obj/machinery/atmospherics/process()
 	build_network()
+	//testing("[src] called parent process to build_network()")
 
 /obj/machinery/atmospherics/proc/network_expand(datum/pipe_network/new_network, obj/machinery/atmospherics/pipe/reference)
 	// Check to see if should be added to network. Add self if so and adjust variables appropriately.

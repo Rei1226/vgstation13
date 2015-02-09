@@ -67,7 +67,6 @@
 		del(t)
 
 	var/mob/living/simple_animal/hostile/retaliate/cluwne/new_mob = new (src.loc)
-	new_mob.universal_speak = 1
 	new_mob.gender=src.gender
 	new_mob.name = pick(clown_names)
 	new_mob.real_name = new_mob.name
@@ -184,7 +183,7 @@
 	for(var/t in organs)
 		del(t)
 
-	var/mob/living/silicon/robot/O = new /mob/living/silicon/robot( loc )
+	var/mob/living/silicon/robot/O = new /mob/living/silicon/robot(get_turf(src))
 
 	// cyborgs produced by Robotize get an automatic power cell
 	O.cell = new(O)

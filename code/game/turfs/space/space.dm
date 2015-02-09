@@ -15,23 +15,6 @@
 /turf/space/attack_paw(mob/user as mob)
 	return src.attack_hand(user)
 
-/turf/space/attack_hand(mob/user as mob)
-	if ((user.restrained() || !( user.pulling )))
-		return
-	if (user.pulling.anchored)
-		return
-	if ((user.pulling.loc != user.loc && get_dist(user, user.pulling) > 1))
-		return
-	if (ismob(user.pulling))
-		var/mob/M = user.pulling
-		var/atom/movable/t = M.pulling
-		M.stop_pulling()
-		step(user.pulling, get_dir(user.pulling.loc, src))
-		M.start_pulling(t)
-	else
-		step(user.pulling, get_dir(user.pulling.loc, src))
-	return
-
 /turf/space/attackby(obj/item/C as obj, mob/user as mob)
 
 	if (istype(C, /obj/item/stack/rods))
@@ -78,7 +61,6 @@
 		return
 	..()
 	if ((!(A) || src != A.loc))	return
-
 	inertial_drift(A)
 
 	if(ticker && ticker.mode)
@@ -96,6 +78,10 @@
 				return
 
 			var/list/disk_search = A.search_contents_for(/obj/item/weapon/disk/nuclear)
+			if(istype(A, /obj/structure/stool/bed/chair/vehicle))
+				var/obj/structure/stool/bed/chair/vehicle/B = A
+				if(B.buckled_mob)
+					disk_search = B.buckled_mob.search_contents_for(/obj/item/weapon/disk/nuclear)
 			if(!isemptylist(disk_search))
 				if(istype(A, /mob/living))
 					var/mob/living/MM = A
@@ -294,3 +280,9 @@
 				if ((A && A.loc))
 					A.loc.Entered(A)
 	return
+
+/turf/space/singularity_act()
+	return
+
+/turf/space/ChangeTurf(var/turf/N, var/tell_universe=1, var/force_lighting_update = 0)
+	return ..(N, tell_universe, 1)
