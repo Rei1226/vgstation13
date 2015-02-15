@@ -985,6 +985,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 		process_grasp(owner.l_hand, "left hand")
 
 /datum/organ/external/head
+	icon_position = HEAD //these are datums not objects.
 	name = "head"
 	icon_name = "head"
 	display_name = "head"
@@ -1105,6 +1106,7 @@ obj/item/weapon/organ/r_leg
 	icon_state = "r_leg"
 
 obj/item/weapon/organ/head
+	dir = NORTH
 	name = "head"
 	icon_state = "head_m"
 	var/mob/living/carbon/brain/brainmob
@@ -1118,7 +1120,7 @@ obj/item/weapon/organ/head/New(loc, mob/living/carbon/human/H)
 		src.icon_state = H.gender == MALE? "head_m" : "head_f"
 	..()
 	//Add (facial) hair.
-	if(H.f_style)
+	if(H.f_style &&  !H.check_hidden_head_flags(HIDEBEARDHAIR))
 		var/datum/sprite_accessory/facial_hair_style = facial_hair_styles_list[H.f_style]
 		if(facial_hair_style)
 			var/icon/facial = new/icon("icon" = facial_hair_style.icon, "icon_state" = "[facial_hair_style.icon_state]_s")
@@ -1127,7 +1129,7 @@ obj/item/weapon/organ/head/New(loc, mob/living/carbon/human/H)
 
 			overlays.Add(facial) // icon.Blend(facial, ICON_OVERLAY)
 
-	if(H.h_style && !(H.head && (H.head.flags & BLOCKHEADHAIR)))
+	if(H.h_style && !H.check_hidden_head_flags(HIDEHEADHAIR))
 		var/datum/sprite_accessory/hair_style = hair_styles_list[H.h_style]
 		if(hair_style)
 			var/icon/hair = new/icon("icon" = hair_style.icon, "icon_state" = "[hair_style.icon_state]_s")

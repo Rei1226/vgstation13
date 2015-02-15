@@ -277,7 +277,7 @@
 			L += get_contents(S)
 		for(var/obj/item/clothing/suit/storage/S in src.contents)//Check for labcoats and jackets
 			L += get_contents(S)
-		for(var/obj/item/clothing/tie/storage/S in src.contents)//Check for holsters
+		for(var/obj/item/clothing/accessory/storage/S in src.contents)//Check for holsters
 			L += get_contents(S)
 		for(var/obj/item/weapon/gift/G in src.contents) //Check for gift-wrapped items
 			L += G.gift
@@ -914,7 +914,7 @@ default behaviour is:
 					else
 						dense = 1
 				if(dense) break
-			if((tmob.a_intent == "help" || tmob.restrained()) && (a_intent == "help" || src.restrained()) && tmob.canmove && canmove && !dense && can_move_mob(tmob, 1, 0)) // mutual brohugs all around!
+			if((tmob.a_intent == I_HELP || tmob.restrained()) && (a_intent == I_HELP || src.restrained()) && tmob.canmove && canmove && !dense && can_move_mob(tmob, 1, 0)) // mutual brohugs all around!
 				var/turf/oldloc = loc
 				loc = tmob.loc
 				tmob.loc = oldloc
