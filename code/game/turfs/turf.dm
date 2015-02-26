@@ -272,14 +272,14 @@
 
 	if(connections) connections.erase_all()
 
-	if(istype(src,/turf/simulated))
+	if(istype(src,/turf/simulated) && !iscatwalk(src))
 		//Yeah, we're just going to rebuild the whole thing.
 		//Despite this being called a bunch during explosions,
 		//the zone will only really do heavy lifting once.
 		var/turf/simulated/S = src
 		env = S.air //Get the air before the change
 		if(S.zone) S.zone.rebuild()
-	if(istype(src,/turf/simulated/floor))
+	if(istype(src,/turf/simulated/floor) && !iscatwalk(src))
 		var/turf/simulated/floor/F = src
 		if(F.floor_tile)
 			returnToPool(F.floor_tile)
@@ -472,3 +472,15 @@
 				O.singularity_act()
 	ChangeTurf(/turf/space)
 	return(2)
+
+//Return a lattice to allow catwalk building
+/turf/proc/canBuildCatwalk()
+	return 0
+
+//Return true to allow lattice building
+/turf/proc/canBuildLattice()
+	return 0
+
+//Return a lattice to allow plating building, return 0 for error message, return -1 for silent fail.
+/turf/proc/canBuildPlating()
+	return -1

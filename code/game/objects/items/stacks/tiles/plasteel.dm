@@ -27,6 +27,7 @@
 		spawn
 			src.Destroy()
 			returnToPool(src)
+
 /obj/item/stack/tile/plasteel/New(var/loc, var/amount=null)
 	. = ..()
 	pixel_x = rand(1, 14)
@@ -63,7 +64,6 @@
 	return
 
 /obj/item/stack/tile/plasteel/attackby(obj/item/W as obj, mob/user as mob)
-	..()
 	if(iswelder(W))
 		var/obj/item/weapon/weldingtool/WT = W
 		if(amount < 4)
@@ -83,5 +83,22 @@
 			R.use(4)
 			if (!R && replace)
 				user.put_in_hands(M)
-		return
-	..()
+		return 1
+	return ..()
+
+/obj/item/stack/tile/plasteel/afterattack(atom/target, mob/user, adjacent, params)
+	if(adjacent)
+		if(isturf(target))
+			var/turf/T = target
+			var/obj/structure/lattice/L = T.canBuildPlating()
+			if(istype(L))
+				var/obj/item/stack/tile/plasteel/S = src
+				qdel(L)
+				playsound(get_turf(src), 'sound/weapons/Genhit.ogg', 50, 1)
+				S.build(T)
+				S.use(1)
+				return
+			else
+				if(!L)
+					user << "<span class='warning'>The plating is going to need some support.</span>"
+					return

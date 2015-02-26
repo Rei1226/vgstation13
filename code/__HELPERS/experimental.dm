@@ -59,26 +59,31 @@ var/list/exclude = list("inhand_states", "loc", "locs", "parent_type", "vars", "
  */
 /proc/getFromPool()
 	var/A = args[1]
-	var/list/B = args - A
+	var/list/B = list()
+	B += (args - A)
 	if(length(masterPool["[A]"]) <= 0)
 		#ifdef DEBUG_OBJECT_POOL
-		world << text("DEBUG_OBJECT_POOL: new proc has been called ([]).", A)
+		world << text("DEBUG_OBJECT_POOL: new proc has been called ([] | []).", A, list2params(B))
 		#endif
 		//so the GC knows we're pooling this type.
 		if(isnull(masterPool["[A]"]))
-			masterPool["[A]"] = new
-		return new A(arglist(B))
+			masterPool["[A]"] = list(new A)
+		if(B && B.len)
+			return new A(arglist(B))
+		else
+			return new A()
 
 	var/atom/movable/O = masterPool["[A]"][1]
 	masterPool["[A]"] -= O
 
 	#ifdef DEBUG_OBJECT_POOL
-	world << text("DEBUG_OBJECT_POOL: getFromPool([]) [] left.", A, length(masterPool[A]))
+	world << text("DEBUG_OBJECT_POOL: getFromPool([]) [] left arglist([]).", A, length(masterPool[A]), list2params(B))
 	#endif
 	if(!O || !istype(O))
 		O = new A(arglist(B))
 	else
-		O.loc = B[1]
+		if(length(B))
+			O.loc = B[1]
 		O.New(arglist(B))
 	return O
 
@@ -104,7 +109,7 @@ var/list/exclude = list("inhand_states", "loc", "locs", "parent_type", "vars", "
 		return
 
 	if(isnull(masterPool["[AM.type]"]))
-		masterPool["[AM.type]"] = new
+		masterPool["[AM.type]"] = list()
 
 	AM.resetVariables()
 	masterPool["[AM.type]"] += AM

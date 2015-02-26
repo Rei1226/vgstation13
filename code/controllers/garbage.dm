@@ -5,7 +5,7 @@
 
 var/list/gc_hard_del_types = new
 var/datum/garbage_collector/garbageCollector
-
+var/soft_dels = 0
 /client/verb/gc_dump_hdl()
 	set name = "(GC) Hard Del List"
 	set desc = "List types that are hard del()'d by the GC."

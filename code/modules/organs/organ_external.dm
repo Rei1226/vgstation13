@@ -583,8 +583,9 @@ Note that amputating the affected organ does in fact remove the infection from t
 					organ= new /obj/item/weapon/organ/head(owner.loc, owner)
 				var/datum/organ/internal/brain/B = owner.internal_organs_by_name["brain"]
 				var/obj/item/weapon/organ/head/H = organ
-				H.organ_data = B
-				B.organ_holder = organ
+				if(B)
+					H.organ_data = B
+					B.organ_holder = organ
 				owner.internal_organs_by_name["brain"] = null
 				owner.internal_organs_by_name -= "brain"
 				owner.internal_organs -= B
@@ -985,7 +986,6 @@ Note that amputating the affected organ does in fact remove the infection from t
 		process_grasp(owner.l_hand, "left hand")
 
 /datum/organ/external/head
-	icon_position = HEAD //these are datums not objects.
 	name = "head"
 	icon_name = "head"
 	display_name = "head"
